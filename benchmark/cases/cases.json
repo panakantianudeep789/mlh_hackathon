@@ -1,0 +1,142 @@
+[
+  {
+    "case_id": "CASE-01",
+    "title": "Division by Zero on Empty Numbers List",
+    "description": "average([]) raises ZeroDivisionError when an empty list is passed",
+    "relevant_file": "app/calculator.py",
+    "target_symbol": "average",
+    "known_issue": "No empty list check before division sum(numbers) / len(numbers)",
+    "expected_behavior": "Raise ValueError('Cannot calculate average of an empty list') when numbers is empty",
+    "regression_test": "import pytest\nfrom app.calculator import average\n\ndef test_case_01():\n    with pytest.raises(ValueError):\n        average([])\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/calculator.py",
+      "expected_symbol": "average"
+    }
+  },
+  {
+    "case_id": "CASE-02",
+    "title": "Discount Percentage Boundary Validation",
+    "description": "calculate_discount accepts discount > 100% and negative discounts, causing negative prices",
+    "relevant_file": "app/calculator.py",
+    "target_symbol": "calculate_discount",
+    "known_issue": "Missing validation for discount_percent range [0.0, 100.0] and price >= 0",
+    "expected_behavior": "Raise ValueError when discount_percent < 0 or > 100 or price < 0",
+    "regression_test": "import pytest\nfrom app.calculator import calculate_discount\n\ndef test_case_02():\n    with pytest.raises(ValueError):\n        calculate_discount(100.0, 120.0)\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/calculator.py",
+      "expected_symbol": "calculate_discount"
+    }
+  },
+  {
+    "case_id": "CASE-03",
+    "title": "Off-by-One Loop Starting Index Skips First Element",
+    "description": "find_first_positive fails to inspect the element at index 0 because loop starts at range(1, len(numbers))",
+    "relevant_file": "app/calculator.py",
+    "target_symbol": "find_first_positive",
+    "known_issue": "Loop index starts at 1 instead of 0",
+    "expected_behavior": "Inspect all elements starting at index 0",
+    "regression_test": "from app.calculator import find_first_positive\n\ndef test_case_03():\n    assert find_first_positive([10, -5, 2]) == 10\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/calculator.py",
+      "expected_symbol": "find_first_positive"
+    }
+  },
+  {
+    "case_id": "CASE-04",
+    "title": "Unhandled Empty String in User Age Parsing",
+    "description": "parse_user_age crashes without validation when an empty or whitespace string is provided",
+    "relevant_file": "app/calculator.py",
+    "target_symbol": "parse_user_age",
+    "known_issue": "Direct int(age_str) call without validating empty or whitespace input",
+    "expected_behavior": "Raise ValueError for empty or non-numeric string input",
+    "regression_test": "import pytest\nfrom app.calculator import parse_user_age\n\ndef test_case_04():\n    with pytest.raises(ValueError):\n        parse_user_age('  ')\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/calculator.py",
+      "expected_symbol": "parse_user_age"
+    }
+  },
+  {
+    "case_id": "CASE-05",
+    "title": "Null or Empty User Identifier in Summary Generation",
+    "description": "format_user_summary fails when user_id is None or blank string",
+    "relevant_file": "app/calculator.py",
+    "target_symbol": "format_user_summary",
+    "known_issue": "Missing validation for None or empty user_id string",
+    "expected_behavior": "Raise ValueError('user_id is required') when user_id is None or empty",
+    "regression_test": "import pytest\nfrom app.calculator import format_user_summary\n\ndef test_case_05():\n    with pytest.raises(ValueError, match='user_id is required'):\n        format_user_summary(None)\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/calculator.py",
+      "expected_symbol": "format_user_summary"
+    }
+  },
+  {
+    "case_id": "CASE-06",
+    "title": "Direct Dict Key Access Triggers KeyError",
+    "description": "get_user_role accesses dictionary key without checking if username exists",
+    "relevant_file": "app/data_store.py",
+    "target_symbol": "get_user_role",
+    "known_issue": "Direct access users_dict[username]['role'] raises KeyError without friendly message",
+    "expected_behavior": "Raise KeyError with friendly message or return default",
+    "regression_test": "import pytest\nfrom app.data_store import get_user_role\n\ndef test_case_06():\n    with pytest.raises(KeyError):\n        get_user_role({}, 'unknown_user')\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/data_store.py",
+      "expected_symbol": "get_user_role"
+    }
+  },
+  {
+    "case_id": "CASE-07",
+    "title": "Mutable Default Argument Causes State Leak Across Invocations",
+    "description": "append_to_cache uses cache=[] default parameter which accumulates across calls",
+    "relevant_file": "app/data_store.py",
+    "target_symbol": "append_to_cache",
+    "known_issue": "Mutable default argument in Python function definition",
+    "expected_behavior": "Use None as default and initialize empty list inside function body",
+    "regression_test": "from app.data_store import append_to_cache\n\ndef test_case_07():\n    r1 = append_to_cache('a')\n    r2 = append_to_cache('b')\n    assert r2 == ['b']\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/data_store.py",
+      "expected_symbol": "append_to_cache"
+    }
+  },
+  {
+    "case_id": "CASE-08",
+    "title": "Boundary Condition in Binary Search Causes IndexError",
+    "description": "binary_search initializes high = len(arr) and uses while low <= high",
+    "relevant_file": "app/data_store.py",
+    "target_symbol": "binary_search",
+    "known_issue": "high should be len(arr) - 1 to prevent IndexError when target > all elements",
+    "expected_behavior": "Returns -1 without out-of-bounds error when target is greater than all elements",
+    "regression_test": "from app.data_store import binary_search\n\ndef test_case_08():\n    assert binary_search([1, 2, 3], 99) == -1\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/data_store.py",
+      "expected_symbol": "binary_search"
+    }
+  },
+  {
+    "case_id": "CASE-09",
+    "title": "AttributeError on Missing Configuration Section",
+    "description": "read_config_value calls .get(key) on None when config section is missing",
+    "relevant_file": "app/data_store.py",
+    "target_symbol": "read_config_value",
+    "known_issue": "Calling .get(key) on None raises AttributeError: 'NoneType' object has no attribute 'get'",
+    "expected_behavior": "Return None safely if section does not exist",
+    "regression_test": "from app.data_store import read_config_value\n\ndef test_case_09():\n    assert read_config_value({}, 'missing_sec', 'key') is None\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/data_store.py",
+      "expected_symbol": "read_config_value"
+    }
+  },
+  {
+    "case_id": "CASE-10",
+    "title": "Missing Validation for Negative Amounts in Tax Calculation",
+    "description": "compute_tax allows negative amount and negative tax rate without validation",
+    "relevant_file": "app/data_store.py",
+    "target_symbol": "compute_tax",
+    "known_issue": "No input validation for negative numbers in financial calculation",
+    "expected_behavior": "Raise ValueError for negative amount or invalid tax rate",
+    "regression_test": "import pytest\nfrom app.data_store import compute_tax\n\ndef test_case_10():\n    with pytest.raises(ValueError):\n        compute_tax(-50.0, 0.1)\n",
+    "evaluation_criteria": {
+      "retrieval_target": "app/data_store.py",
+      "expected_symbol": "compute_tax"
+    }
+  }
+]
